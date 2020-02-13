@@ -1,0 +1,86 @@
+{
+  "parent_dir": WindowsPath("assets"),
+  "tmx_file": "assets/level_test.tmx",
+  "version": "1.2",
+  "tiled_version": "2020.02.12",
+  "orientation": "orthogonal",
+  "render_order": "right-down",
+  "map_size": Size((width = 20), (height = 15)),
+  "tile_size": Size((width = 16), (height = 16)),
+  "infinite": False,
+  "next_layer_id": 3,
+  "next_object_id": 1,
+  "tile_sets": {
+    1: TileSet(
+      (name = "smb"),
+      (max_tile_size = Size((width = 16), (height = 16))),
+      (spacing = None),
+      (margin = None),
+      (tile_count = 924),
+      (columns = 33),
+      (tile_offset = None),
+      (grid = None),
+      (properties = None),
+      (image = Image(
+        (source = "smb_tileset.png"),
+        (size = Size((width = 528), (height = 448))),
+        (trans = None)
+      )),
+      (terrain_types = None),
+      (tiles = {})
+    )
+  },
+  "layers": [
+    TileLayer(
+      (id_ = None),
+      (name = "Tile Layer 1"),
+      (offset = None),
+      (opacity = None),
+      (properties = None),
+      (size = Size((width = 20), (height = 15))),
+      (data = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 507, 574, 575, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 274, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 273, 306, 275, 0, 0, 0, 0, 0, 0, 0, 0, 265, 266, 0, 0, 0, 0, 0, 0],
+        [
+          273,
+          306,
+          307,
+          308,
+          275,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          298,
+          299,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      ])
+    )
+  ],
+  "hex_side_length": None,
+  "stagger_axis": None,
+  "stagger_index": None,
+  "background_color": None,
+  "properties": None
+}

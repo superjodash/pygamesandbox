@@ -1,8 +1,7 @@
 from testapp import TestApp
-from level import Level
-from tilemap import Tilemap
 from layers import TestLevel
-
+from pytiled_pygame import *
+import pytiled_parser
 
 """
 Mario
@@ -12,24 +11,20 @@ Sprites: 8x8 and 8x16
 """
 
 
-def loadLevel():
-    level = Level()
-    level.load_file()
-    for y in range(level.height):
-        for x in range(level.width):
-            print((x,y), level.get_tile(x, y))
-
-def testTiles():
-    tm = Tilemap("level.map", "assets/smb_tileset.png")
-    for y in range(tm.Level.height):
-        for x in range(tm.Level.width):
-            print((x,y), tm.get_tile(x, y))
-
-if __name__ == "__main__":
+def runApp():
     #a = TestApp((320, 240))
     a = TestApp((640, 480))
     a.add_layer(TestLevel())
     a.run()
-    #theApp.run()
-    #loadLevel()
-    #testTiles()
+
+
+def testTmxLoader():
+    map = Tilemap("assets/level_test.tmx")
+    print(map)
+
+
+if __name__ == "__main__":
+    # runApp()
+    # loadLevel()
+    # testTiles()
+    testTmxLoader()
