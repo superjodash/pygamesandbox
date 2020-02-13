@@ -1,7 +1,8 @@
 [level]
 #https://nesmaps.com/maps/SuperMarioBrothers/sprites/SuperMarioBrothersSprites.html
 #https://www.spriters-resource.com/nes/supermariobros/
-tileset = tileset.png
+tileset = smb_tileset.png
+tilesize = 16,16
 map = 00000000000000000000
       00000000000000000000
       00000000000000000000
@@ -12,32 +13,60 @@ map = 00000000000000000000
       00000000000000000000
       00000000000000000000
       00000000000000000000
-      00000000000000000000
-      00000000000000000000
-      00000000000000000000
-      00000000000000000000
-      12341111111111111111
+      00900000000000000000
+      08BA0000000000000000
+      8BCDA000000000000000
+      11111111111111111111
+      11111111111111111111
 
 [0]
 name = air
-tile = 0,0,16,16
+tile = -1,-1
 
 [1]
 name = overworld_floor
 wall = true
 block = true
+tile = 0,0,16,16
 
 [2]
 name = overworld_brick_cap
 wall = true
 block = true
+tile = 16,0,16,16
 
 [3]
 name = overworld_brick
 wall = true
 block = true
+tile = 32,0,16,16
 
 [4]
 name = overworld_box
 wall = true
 block = true
+tile = 48,0,16,16
+
+[8]
+name = hill_left
+tile = 128,128,16,16
+
+[9]
+name = hill_top
+tile = 144,128,16,16
+
+[A]
+name = hill_right
+tile = 160,128,16,16
+
+[B]
+name = hill_body_right
+tile = 128,144,16,16
+
+[C]
+name = hill_body_blank
+tile = 144,144,16,16
+
+[D]
+name = hill_body_left
+tile = 160,144,16,16
