@@ -1,5 +1,7 @@
+import os, sys
 from testapp import TestApp
 from layers import TestLevel
+import pygame
 from pytiled_pygame import *
 import pytiled_parser
 
@@ -19,7 +21,11 @@ def runApp():
 
 
 def testTmxLoader():
-    map = Tilemap("assets/level_test.tmx")
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    path = sys.path[0]
+    assetdir = os.path.join(path, 'assets')
+    map = Tilemap("level_test.tmx", assetdir)
     print(map)
 
 
