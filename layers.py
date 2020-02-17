@@ -8,14 +8,19 @@ class TestLevel(Layer):
     def __init__(self):
         self._tm = Tilemap("level.map", "assets/smb_tileset.png")
         self._tilesize = self._tm.get_tilesize()
-        self.canvassize = (0,0)
+        self.canvassize = (0,0) # gets set before first call
 
     def on_render(self, time, buffer):
         canvas = pygame.Surface(self.canvassize, pg.SRCALPHA)
-        for y in range(self._tm.Level.height):
-            for x in range(self._tm.Level.width):
-                dx, dy = self._tilesize[0] * x, self._tilesize[1] * y
-                img = self._tm.get_tile(x, y)
-                if img != None:
-                    canvas.blit(img, (dx, dy))
-        buffer.blit(canvas, (0,0))
+        # for layer in self._tm._layers:
+        #     for t in layer.
+
+class TextLayer(Layer):
+
+    def __init__(self):
+        self.canvassize = (0,0) # gets set before first call
+
+    def on_render(self, time, buffer):
+        basicfont = pygame.font.SysFont(None, 24)
+        text = basicfont.render("text", True, (0, 0, 0))
+        buffer.blit(text, (50, 50))
