@@ -11,6 +11,7 @@ from camera import Camera
 
 DELTATIME = 1/60
 
+
 class TestApp:
 
     def __init__(self, size):
@@ -18,12 +19,11 @@ class TestApp:
         self._level = None
         self._clock = pygame.time.Clock()
         self.size = size
-        self._rendersize= (320, 240)
+        self._rendersize = (256, 224)
         pygame.init()
         self._screen = pygame.display.set_mode(self.size, RESIZABLE)
         self._renderBuffer = pygame.Surface(self._rendersize)
         self.camera = Camera()
-
 
     def bootstrap(self):
         self.loadKeyboardHandling()
@@ -43,14 +43,7 @@ class TestApp:
         assetdir = os.path.join(path, 'assets')
         map = Tilemap("level_test.tmx", assetdir)
 
-        #for layer in map.layers:
-
-
-
-
-
-
-
+        # for layer in map.layers:
 
     def handleDir(self, keyCode, keyState):
         print(f"handling keyboard input {keyCode} : {keyState}")
@@ -90,17 +83,16 @@ class TestApp:
             self._screen = pygame.display.set_mode(self.size, RESIZABLE)
 
     def on_loop(self):
-        #physics
+        # physics
         pass
 
     def on_render(self, delta_time):
         self._renderBuffer.fill((0, 0, 0))
 
-
-
         for l in self._layers:
             l.on_render(delta_time, self._renderBuffer)
-        self._screen.blit(pygame.transform.scale(self._renderBuffer, self.size), (0, 0)) # scale to window size
+        self._screen.blit(pygame.transform.scale(
+            self._renderBuffer, self.size), (0, 0))  # scale to window size
         pygame.display.flip()
 
     def on_cleanup(self):
