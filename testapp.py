@@ -6,8 +6,9 @@ import os
 from keyboard import *
 from pygame.locals import *
 from time import gmtime, strftime
-from pytiled_parser import *
+from pytiled_pygame import *
 from camera import Camera
+from layer import BackgroundLayer
 
 DELTATIME = 1/60
 
@@ -23,7 +24,8 @@ class TestApp:
         pygame.init()
         self._screen = pygame.display.set_mode(self.size, RESIZABLE)
         self._renderBuffer = pygame.Surface(self._rendersize)
-        self.camera = Camera()
+        self._layers = []
+        self.camera = Camera(256, 224)
 
     def bootstrap(self):
         self.loadKeyboardHandling()
@@ -38,12 +40,14 @@ class TestApp:
         self._keyboardState.addMapping(pygame.K_SPACE, self.handleSpace)
 
     def loadLevel(self):
-        self._level = Level()
+        #self._level = Level()
         path = sys.path[0]
         assetdir = os.path.join(path, 'assets')
         map = Tilemap("level_test.tmx", assetdir)
-
         # for layer in map.layers:
+        for ix, layer in enumerate(map.layers):
+            if layer.name == "Sky" or layer.name == "Background":
+                self.add_layer(BackgroundLayer(self.camera, ix, map))
 
     def handleDir(self, keyCode, keyState):
         print(f"handling keyboard input {keyCode} : {keyState}")

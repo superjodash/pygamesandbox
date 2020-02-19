@@ -15,7 +15,7 @@ import pytiled_parser as pyt
 class Tilemap(object):
 
     def __init__(self, tmxfile, assetdir=sys.path[0]):
-        self.map = pyt.parse_tilemap(os.path.join(assetdir,tmxfile))
+        self.map = pyt.parse_tile_map(os.path.join(assetdir,tmxfile))
         self.tilesets = {}
         self.layers = []
         for l in self.map.layers:
@@ -32,6 +32,11 @@ class Tilemap(object):
                 return self.tilesets[i]
         raise ValueError(index, "Invalid index range")
 
+    def image_at_index(self, layerIndex, x, y):
+        spriteIx = self.layers[layerIndex].data_at(x, y)
+        tileset = self.tilesetselector(spriteIx)
+        return tileset.image_at_index(spriteIx)
+
     def image_at(self, layerIndex, rectangle):
         spriteIx = self.layers[layerIndex].data_at(rectangle)
         tileset = self.tilesetselector(spriteIx)
@@ -47,12 +52,12 @@ class TileLevel(object):
 class TileLayer(object):
     def __init__(self, layer):
         self.collision = layer.properties['Collision']
+        self.size = layer.size
         self.name = layer.name
         self.data = layer.data
 
-    def data_at(self, rectangle):
-         rect = pygame.Rect(rectangle)
-         return self._data[rect.y][rect.x]
+    def data_at(self, x, y):
+        return self.data[y][x]
 
 
 class Tileset(object):
