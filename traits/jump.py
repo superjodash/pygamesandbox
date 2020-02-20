@@ -1,5 +1,6 @@
-from trait import Trait
+from traits.trait import Trait
 from Vec2d import Vec2d
+
 
 class Jump(Trait):
     def __init__(self):

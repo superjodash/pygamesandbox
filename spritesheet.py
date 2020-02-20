@@ -23,6 +23,8 @@ images = ss.images_at((0, 0, 16, 16),(17, 0, 16,16), colorkey=(255, 255, 255))
 
 class Spritesheet(object):
     def __init__(self, filename):
+        self._imageCache = {}
+        self.usecache = True
         try:
             self.sheet = pygame.image.load(filename).convert_alpha()
         except pygame.error as message:
@@ -33,13 +35,19 @@ class Spritesheet(object):
     def image_at(self, rectangle, colorkey=None):
         "Loads image from x,y,x+offset,y+offset"
         rect = pygame.Rect(rectangle)
-        image = pygame.Surface(rect.size, pygame.SRCALPHA).convert_alpha()
-        image.blit(self.sheet, (0, 0), rect)
-        if colorkey is not None:
-            if colorkey is -1:
-                colorkey = image.get_at((0, 0))
-            image.set_colorkey(colorkey, pygame.RLEACCEL)
-        return image
+        cached = self._imageCache.get(str(rectangle))
+        if cached == None:
+            image = pygame.Surface(rect.size, pygame.SRCALPHA).convert_alpha()
+            image.blit(self.sheet, (0, 0), rect)
+            if colorkey is not None:
+                if colorkey is -1:
+                    colorkey = image.get_at((0, 0))
+                image.set_colorkey(colorkey, pygame.RLEACCEL)
+            if self.usecache:
+                self._imageCache[str(rectangle)] = image
+            return image
+        else:
+            return cached
     # Load a whole bunch of images and return them as a list
 
     def images_at(self, rects, colorkey=None):

@@ -10,17 +10,28 @@ import sys
 import pygame
 import math
 import pytiled_parser as pyt
+from spritesheet import Spritesheet
+
+
+def loadTilemap(tmx_file, assetdir=sys.path[0]):
+    map = pyt.parse_tile_map(os.path.join(assetdir, tmx_file))
+    return Tilemap(map, assetdir)
+
+
+def loadTileset(tsx_file, assetdir=sys.path[0]):
+    map = pyt.parse_tile_set(os.path.join(assetdir, tsx_file))
+    return Tileset(map, assetdir)
 
 
 class Tilemap(object):
 
-    def __init__(self, tmxfile, assetdir=sys.path[0]):
-        self.map = pyt.parse_tile_map(os.path.join(assetdir,tmxfile))
+    def __init__(self, tilemap: pyt.objects.TileMap, assetdir):
+        self.map = tilemap
+        self.assetdir = assetdir
         self.tilesets = {}
         self.layers = []
         for l in self.map.layers:
             self.layers.append(TileLayer(l))
-        self.assetdir = assetdir
         for k in self.map.tile_sets:
             self.tilesets[k] = Tileset(self.map.tile_sets[k], self.assetdir)
 
@@ -66,38 +77,21 @@ class Tileset(object):
         self.tileset = tileset
         self.tile_count = self.tileset.tile_count
         self.usecache = True
-        try:
-            fp = os.path.join(assetdir, tileset.image.source)
-            self._sheet = pygame.image.load(fp).convert_alpha()
-        except pygame.error as message:
-            print('Unable to load spritesheet image:', tileset.image.source)
-            raise SystemExit(message)
+
+        fp = os.path.join(assetdir, tileset.image.source)
+        self._spriteSheet = Spritesheet(fp)
 
     def image_at_index(self, index):
+        rawIndex = index - 1
         # assumes using tileset w/h
         w = self.tileset.max_tile_size.width
         h = self.tileset.max_tile_size.height
-        y = math.floor(index / self.tileset.columns) * h
-        x = (index % self.tileset.columns) * w
+        y = math.floor(rawIndex / self.tileset.columns) * h
+        x = (rawIndex % self.tileset.columns) * w
         return self.image_at([x, y, w, h])
-        
 
     def image_at(self, rectangle, colorkey=None):
-        "Loads image from x,y,x+offset,y+offset"
-        rect = pygame.Rect(rectangle)
-        cached = self._imageCache.get(str(rectangle))
-        if cached == None:
-            image = pygame.Surface(rect.size, pygame.SRCALPHA).convert_alpha()
-            image.blit(self._sheet, (0, 0), rect)
-            if colorkey is not None:
-                if colorkey is -1:
-                    colorkey = image.get_at((0, 0))
-                image.set_colorkey(colorkey, pygame.RLEACCEL)
-            if self.usecache:
-                self._imageCache[str(rectangle)] = image
-            return image
-        else:
-            return cached
+        return self._spriteSheet.image_at(rectangle)
 
 # use this to get a movable object on the screen
 # this will have its own position, image, animation, etc

@@ -8,7 +8,11 @@ from pygame.locals import *
 from time import gmtime, strftime
 from pytiled_pygame import *
 from camera import Camera
-from layer import BackgroundLayer
+from layers import BackgroundLayer, ForegroundLayer
+from entity import Entity
+from Vec2d import Vec2d
+from traits.velocity import Velocity
+from traits.jump import Jump
 
 DELTATIME = 1/60
 
@@ -25,11 +29,15 @@ class TestApp:
         self._screen = pygame.display.set_mode(self.size, RESIZABLE)
         self._renderBuffer = pygame.Surface(self._rendersize)
         self._layers = []
+        self._entities = []
+        self._mario = None
         self.camera = Camera(256, 224)
+        self.gravity = 2000
 
     def bootstrap(self):
         self.loadKeyboardHandling()
         self.loadLevel()
+        self.loadEntities()
 
     def loadKeyboardHandling(self):
         self._keyboardState = KeyboardState()
@@ -43,17 +51,35 @@ class TestApp:
         #self._level = Level()
         path = sys.path[0]
         assetdir = os.path.join(path, 'assets')
-        map = Tilemap("level_test.tmx", assetdir)
+        map = loadTilemap("level_test.tmx", assetdir)
         # for layer in map.layers:
         for ix, layer in enumerate(map.layers):
             if layer.name == "Sky" or layer.name == "Background":
                 self.add_layer(BackgroundLayer(self.camera, ix, map))
+            elif layer.name == "Foreground":
+                self.add_layer(ForegroundLayer(self.camera, ix, map))
+
+    def loadEntities(self):
+        path = sys.path[0]
+        assetdir = os.path.join(path, 'assets')
+        spritesheet = Spritesheet(os.path.join(
+            assetdir, "smb_char_sprites.gif"))
+        self._mario = Entity()
+        self._mario.pos = Vec2d(64, 64)
+        self._mario.sprite = spritesheet.image_at((276, 42, 14, 18))
+        self._mario.addTrait(Jump())
+        self._mario.addTrait(Velocity())
+        self._entities.append(self._mario)
 
     def handleDir(self, keyCode, keyState):
         print(f"handling keyboard input {keyCode} : {keyState}")
 
     def handleSpace(self, keyCode, keyState):
         print(f"handling keyboard input {keyCode} : {keyState}")
+        if keyState == 1:
+            self._mario.getTrait("jump").start()
+        else:
+            self._mario.getTrait("jump").cancel()
 
     def add_layer(self, layer):
         layer.canvassize = self._rendersize
@@ -62,18 +88,19 @@ class TestApp:
     def run(self):
         self.bootstrap()
         self._running = True
-        accumulatedTime = 0
-        lastTime = 0
+        #accumulatedTime = 0
+        #lastTime = 0
         while self._running:
             time = self._clock.tick()
-            accumulatedTime += (time - lastTime) / 1000
+            #accumulatedTime += (time - lastTime) / 1000
             for event in pygame.event.get():
                 self.on_event(event)
-            self.on_loop()
-            while(accumulatedTime > DELTATIME):
-                self.on_render(DELTATIME)
-                accumulatedTime -= DELTATIME
-            lastTime = time
+            self.on_loop(DELTATIME)
+            # while(accumulatedTime > DELTATIME):
+            self.on_render(DELTATIME)
+            #accumulatedTime -= DELTATIME
+            #lastTime = time
+            self._clock.tick(30)
 
         self.on_cleanup()
 
@@ -86,17 +113,21 @@ class TestApp:
             self.size = event.dict['size']
             self._screen = pygame.display.set_mode(self.size, RESIZABLE)
 
-    def on_loop(self):
+    def on_loop(self, delta_time):
         # physics
-        pass
+        for e in self._entities:
+            e.update(delta_time)
 
     def on_render(self, delta_time):
         self._renderBuffer.fill((0, 0, 0))
 
         for l in self._layers:
             l.on_render(delta_time, self._renderBuffer)
+        for e in self._entities:
+            e.on_render(delta_time, self._renderBuffer)
         self._screen.blit(pygame.transform.scale(
             self._renderBuffer, self.size), (0, 0))  # scale to window size
+        self._mario.vel.y += self.gravity * delta_time
         pygame.display.flip()
 
     def on_cleanup(self):
