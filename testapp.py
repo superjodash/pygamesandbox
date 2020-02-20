@@ -11,6 +11,7 @@ from camera import Camera
 from layers import BackgroundLayer, ForegroundLayer
 from entity import Entity
 from Vec2d import Vec2d
+from Size import Size
 from traits.velocity import Velocity
 from traits.jump import Jump
 
@@ -66,6 +67,7 @@ class TestApp:
             assetdir, "smb_char_sprites.gif"))
         self._mario = Entity()
         self._mario.pos = Vec2d(64, 64)
+        self._mario.size = Size(14, 18)
         self._mario.sprite = spritesheet.image_at((276, 42, 14, 18))
         self._mario.addTrait(Jump())
         self._mario.addTrait(Velocity())

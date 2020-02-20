@@ -1,4 +1,4 @@
-from layer import Layer
+from layer import Layer, EntityLayer
 from tilemap import Tilemap
 import pygame
 import pygame.locals as pg
@@ -67,3 +67,15 @@ class ForegroundLayer(Layer):
                     self.tileMap.image_at_index(
                         self.tileLayerIndex, x + self.rect.x, y + self.rect.y),
                     (x * self.tile_size.width, y * self.tile_size.height))
+
+
+class BackgroundEntityLayer(EntityLayer):
+
+    def __init__(self):
+        super().__init__()
+
+    def on_render(self, time, buffer):
+        for e in self.entities:
+            if e.sprite != None:
+                buffer.blit(e.sprite, (e.pos.x * e.sprite.width,
+                                       e.pos.y * e.sprite.height))
