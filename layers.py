@@ -32,7 +32,7 @@ class TextLayer(Layer):
 class BackgroundLayer(Layer):
 
     def __init__(self, rect, tileLayerIndex, tileMap):
-        super(Layer, self).__init__()
+        super().__init__()
         self.rect = rect
         self.tileLayerIndex = tileLayerIndex
         self.tileMap = tileMap

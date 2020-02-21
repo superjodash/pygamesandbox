@@ -14,6 +14,7 @@ from Vec2d import Vec2d
 from Size import Size
 from traits.velocity import Velocity
 from traits.jump import Jump
+from level import Level
 
 DELTATIME = 1/60
 
@@ -30,10 +31,11 @@ class TestApp:
         self._screen = pygame.display.set_mode(self.size, RESIZABLE)
         self._renderBuffer = pygame.Surface(self._rendersize)
         self._layers = []
-        self._entities = []
         self._mario = None
         self.camera = Camera(256, 224)
         self.gravity = 2000
+        self._map = None
+        self._level = None
 
     def bootstrap(self):
         self.loadKeyboardHandling()
@@ -52,14 +54,43 @@ class TestApp:
         #self._level = Level()
         path = sys.path[0]
         assetdir = os.path.join(path, 'assets')
-        map = loadTilemap("level_test.tmx", assetdir)
-        # for layer in map.layers:
-        for ix, layer in enumerate(map.layers):
-            if layer.name == "Sky" or layer.name == "Background":
-                self.add_layer(BackgroundLayer(self.camera, ix, map))
-            elif layer.name == "Foreground":
-                self.add_layer(ForegroundLayer(self.camera, ix, map))
+        self._map = loadTilemap("level_test.tmx", assetdir)
 
+        self._level = Level()
+        self._level.comp.layers.append(self.backgroundRenderer)
+        layer = self._map.get_layer("Foreground")
+
+        dx = int(self.camera.width / self._map.map.tile_size.width)
+        dy = int(self.camera.height / self._map.map.tile_size.height)
+        for y in range(dy):
+            for x in range(dx):
+                self._level.grid.set(x, y, {
+                    "name": layer.data_at(x, y)
+                })
+
+        # for layer in map.layers:
+        # for ix, layer in enumerate(map.layers):
+        #     if layer.name == "Sky" or layer.name == "Background":
+        #         self.add_layer(BackgroundLayer(self.camera, ix, map))
+        #     elif layer.name == "Foreground":
+        #         self.add_layer(ForegroundLayer(self.camera, ix, map))
+
+        
+    # def loadLevelLayer(self, rect, ix, map):
+    #     dx = int(rect.width / map.tile_size.width)
+    #     dy = int(rect.height / map.tile_size.height)
+    #     for y in range(dy):
+    #         for x in range(dx):
+    #             self._level.grid.set(x, y, {
+    #                 "name": map.id_at_index(x, y)
+    #             })
+
+    def backgroundRenderer(self, buffer, camera):
+        for ix, layer in enumerate(self._map.layers):
+            if layer.name == "Sky" or layer.name == "Background":
+                self.add_layer(BackgroundLayer(self.camera, ix, self._map))
+    
+               
     def loadEntities(self):
         path = sys.path[0]
         assetdir = os.path.join(path, 'assets')
@@ -71,7 +102,7 @@ class TestApp:
         self._mario.sprite = spritesheet.image_at((276, 42, 14, 18))
         self._mario.addTrait(Jump())
         self._mario.addTrait(Velocity())
-        self._entities.append(self._mario)
+        self._level.entities.add(self._mario)
 
     def handleDir(self, keyCode, keyState):
         print(f"handling keyboard input {keyCode} : {keyState}")
@@ -116,17 +147,20 @@ class TestApp:
             self._screen = pygame.display.set_mode(self.size, RESIZABLE)
 
     def on_loop(self, delta_time):
-        # physics
-        for e in self._entities:
-            e.update(delta_time)
+        self._level.update(delta_time)
+        
 
     def on_render(self, delta_time):
         self._renderBuffer.fill((0, 0, 0))
 
-        for l in self._layers:
-            l.on_render(delta_time, self._renderBuffer)
-        for e in self._entities:
+        # draw backgrounds
+        self._level.comp.draw(self._renderBuffer, self.camera)
+
+        #for l in self._layers:
+        #    l.on_render(delta_time, self._renderBuffer)
+        for e in self._level.entities:
             e.on_render(delta_time, self._renderBuffer)
+        # render to screen
         self._screen.blit(pygame.transform.scale(
             self._renderBuffer, self.size), (0, 0))  # scale to window size
         self._mario.vel.y += self.gravity * delta_time
