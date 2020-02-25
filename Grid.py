@@ -11,7 +11,7 @@ class Grid(object):
         self.grid[x][y] = value
 
     def get(self, x, y):
-        ix  = self.grid[x]
+        ix  = self.grid.get(x)
         if ix != None:
-            return ix[y]
+            return ix.get(y)
         return None

@@ -8,8 +8,8 @@ import pytiled_parser
 """
 Mario
 Screen: 320x240 (20x15 tiles)
+Screen Render: 256, 224 (16, 14)
 Sprites: 8x8 and 8x16
-
 """
 
 
@@ -19,18 +19,5 @@ def runApp():
     a.run()
 
 
-def testTmxLoader():
-    pygame.init()
-    screen = pygame.display.set_mode((800, 600))
-    path = sys.path[0]
-    assetdir = os.path.join(path, 'assets')
-    map = Tilemap("level_test.tmx", assetdir)
-    img = map.image_at(0, (0, 0, 16, 16))
-    #print(map._map.__dict__)
-
-
 if __name__ == "__main__":
     runApp()
-    # loadLevel()
-    # testTiles()
-    #testTmxLoader()

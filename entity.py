@@ -4,8 +4,8 @@ import pygame
 
 
 class Entity(object):
-    def __init__(self):
-        self._name = "Entity"
+    def __init__(self, name="Entity"):
+        self._name = name
         self._traits = {}
         self.pos = Vec2d(0, 0)
         self.vel = Vec2d(0, 0)
@@ -23,7 +23,7 @@ class Entity(object):
         t = self.getTrait(name)
         del(t)
 
-    def update(self, deltaTime):
+    def on_update(self, deltaTime):
         for t in self._traits:
             self._traits[t].update(self, deltaTime)
 

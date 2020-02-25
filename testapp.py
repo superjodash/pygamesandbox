@@ -11,6 +11,7 @@ from camera import Camera
 from layers import BackgroundLayer, ForegroundLayer
 from entity import Entity
 from Vec2d import Vec2d
+from Grid import Grid
 from Size import Size
 from traits.velocity import Velocity
 from traits.jump import Jump
@@ -26,13 +27,15 @@ class TestApp:
         self._level = None
         self._clock = pygame.time.Clock()
         self.size = size
-        self._rendersize = (256, 224)
         pygame.init()
         self._screen = pygame.display.set_mode(self.size, RESIZABLE)
+        self._rendersize = (320, 240)
         self._renderBuffer = pygame.Surface(self._rendersize)
         self._layers = []
         self._mario = None
         self.camera = Camera(256, 224)
+        self.camera.pos = Vec2d(48, 0)
+        self._lastCameraPos = Vec2d(0,0)
         self.gravity = 2000
         self._map = None
         self._level = None
@@ -57,38 +60,46 @@ class TestApp:
         self._map = loadTilemap("level_test.tmx", assetdir)
 
         self._level = Level()
+        self._level.level_size = Size(self._map.map.map_size)
         self._level.comp.layers.append(self.backgroundRenderer)
-        layer = self._map.get_layer("Foreground")
+        #layer = self._map.get_layer("Foreground")
 
         dx = int(self.camera.width / self._map.map.tile_size.width)
         dy = int(self.camera.height / self._map.map.tile_size.height)
+        for layer in self._map.layers:
+            gg = None
+            if layer.name == "Foreground":
+                self.loadSingleLevel(self._level.grid, layer, dx, dy)
+                self._level.renderLayers.append(self._level.grid)
+            else:
+                gg = Grid()
+                self._level.renderLayers.append(gg)
+                self.loadSingleLevel(gg, layer, dx, dy)
+
+    def loadSingleLevel(self, grid, layer, dx, dy):
         for y in range(dy):
             for x in range(dx):
-                self._level.grid.set(x, y, {
-                    "name": layer.data_at(x, y)
-                })
+                data = grid.get(x, y)
+                if data == None:
+                    data = { "layer": []}
+                data["layer"].append(layer.data_at(x, y))
+                grid.set(x, y, data)
+       
 
-        # for layer in map.layers:
-        # for ix, layer in enumerate(map.layers):
-        #     if layer.name == "Sky" or layer.name == "Background":
-        #         self.add_layer(BackgroundLayer(self.camera, ix, map))
-        #     elif layer.name == "Foreground":
-        #         self.add_layer(ForegroundLayer(self.camera, ix, map))
-
-        
-    # def loadLevelLayer(self, rect, ix, map):
-    #     dx = int(rect.width / map.tile_size.width)
-    #     dy = int(rect.height / map.tile_size.height)
-    #     for y in range(dy):
-    #         for x in range(dx):
-    #             self._level.grid.set(x, y, {
-    #                 "name": map.id_at_index(x, y)
-    #             })
-
-    def backgroundRenderer(self, buffer, camera):
-        for ix, layer in enumerate(self._map.layers):
-            if layer.name == "Sky" or layer.name == "Background":
-                self.add_layer(BackgroundLayer(self.camera, ix, self._map))
+    def backgroundRenderer(self, level, buffer, camera):
+        # TODO: Is not taking into consideration camera 
+        cx = math.floor(camera.pos.x / self._map.map.tile_size.width)
+        #cy = math.floor(camera.pos.y / self._map.map.tile_size.height)
+        for y in range(level.level_size.height):
+            dy = y * level.tile_size.height
+            for x in range(cx, level.level_size.width + cx):
+                dx = x * level.tile_size.width
+                for layer in level.renderLayers:
+                    data = layer.get(x, y)
+                    if data == None:
+                        continue
+                    for id in data["layer"]:
+                        buffer.blit(self._map.image_at_id(id), (dx, dy))
     
                
     def loadEntities(self):
@@ -96,7 +107,7 @@ class TestApp:
         assetdir = os.path.join(path, 'assets')
         spritesheet = Spritesheet(os.path.join(
             assetdir, "smb_char_sprites.gif"))
-        self._mario = Entity()
+        self._mario = Entity("mario")
         self._mario.pos = Vec2d(64, 64)
         self._mario.size = Size(14, 18)
         self._mario.sprite = spritesheet.image_at((276, 42, 14, 18))
@@ -113,10 +124,6 @@ class TestApp:
             self._mario.getTrait("jump").start()
         else:
             self._mario.getTrait("jump").cancel()
-
-    def add_layer(self, layer):
-        layer.canvassize = self._rendersize
-        self._layers.append(layer)
 
     def run(self):
         self.bootstrap()
@@ -147,22 +154,26 @@ class TestApp:
             self._screen = pygame.display.set_mode(self.size, RESIZABLE)
 
     def on_loop(self, delta_time):
-        self._level.update(delta_time)
+        self._level.on_update(delta_time)
         
 
     def on_render(self, delta_time):
-        self._renderBuffer.fill((0, 0, 0))
+        #self._renderBuffer.fill((0, 0, 0))
 
-        # draw backgrounds
-        self._level.comp.draw(self._renderBuffer, self.camera)
+        #if self.camera.pos != self._lastCameraPos:
+        if True:
+            # draw backgrounds
+            self._level.comp.draw(self._renderBuffer, self.camera)
+            self._lastCameraPos = self.camera.pos
 
         #for l in self._layers:
         #    l.on_render(delta_time, self._renderBuffer)
         for e in self._level.entities:
             e.on_render(delta_time, self._renderBuffer)
+
         # render to screen
-        self._screen.blit(pygame.transform.scale(
-            self._renderBuffer, self.size), (0, 0))  # scale to window size
+        self._screen.blit(pygame.transform.scale(self._renderBuffer, self.size), (0, 0))  # scale to window size
+
         self._mario.vel.y += self.gravity * delta_time
         pygame.display.flip()
 

@@ -2,4 +2,18 @@
 http://www.mariouniverse.com/sprites-nes-smb/
 
 Level
-      
+
+Init
+    Load Tilemap (level data)
+    Load Spritesheet (mario)
+
+Game Loop
+    Events
+    Update Loop
+        Update level layers
+        Update entities
+        Update camera
+
+    Render Loop
+        Render level layers
+        Render entities

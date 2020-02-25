@@ -1,4 +1,4 @@
-
+from Vec2d import Vec2d
 
 class Camera(object):
 
@@ -7,3 +7,4 @@ class Camera(object):
         self.y = 0
         self.width = width
         self.height = height
+        self.pos = Vec2d(0, 0)
